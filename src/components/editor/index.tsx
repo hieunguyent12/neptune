@@ -222,6 +222,19 @@ export default function Editor() {
 
   const onSelectShape = (shape: SHAPE) => setActiveShape(shape);
 
+  const exportToJson = () => {
+    const json = JSON.stringify(editorManager.getAllElements());
+    console.log(json);
+
+    // TODO: encrypt them?
+    // save to database
+  };
+
+  const loadFromJson = () => {
+    // editorManager.replaceAllElements(JSON.parse(TEST_JSON));
+    // editorManager.drawElements();
+  };
+
   const renderShapesOptions = () => {
     return Object.values(SHAPES).map((shape) => (
       <ShapeOption
@@ -354,6 +367,11 @@ export default function Editor() {
         Log elements
       </button>
 
+      <button onClick={exportToJson} className="ml-2">
+        Export to JSON
+      </button>
+
+      <button onClick={loadFromJson}>Load from JSON</button>
       <div className="text-editor" ref={textEditorRef}>
         {showTextEditor &&
           activeElement &&

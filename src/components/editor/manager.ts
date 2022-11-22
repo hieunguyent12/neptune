@@ -50,6 +50,10 @@ class Manager {
     return this.elements[id];
   }
 
+  public replaceAllElements(elements: { [key: string]: Element }) {
+    this.elements = elements;
+  }
+
   public updateElementById(id: string, updatedElement: Element): void {
     if (this.getElementById(id)) {
       this.elements[id] = {
@@ -152,7 +156,7 @@ class Manager {
         } else {
           this.rc.rectangle(
             element.x - 10,
-            element.y - 20,
+            element.y - 10,
             element.width + 20,
             element.height + 20,
             {
