@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+body > div:first-child,
+div#__next,
+div#__next > div {
+  height: 100%;
+}
+
+.text-editor-input {
+  position: absolute;
+  display: inline-block;
+  min-height: 1em;
+  max-height: 776px;
+  text-align: left;
+  vertical-align: top;
+  backface-visibility: hidden;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  padding: 0px;
+  outline: 0px;
+  resize: none;
+  font-size: 15px;
+  font-family: serif;
+  line-height: 16px;
+}
