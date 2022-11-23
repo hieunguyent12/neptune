@@ -4,6 +4,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 
 import { Maybe } from "../../types/common";
 import { Element, MarkOptional } from "./types";
+import { getRectCoordinates } from "./utils";
 
 // make width, height, and other properties optional when creating element because we don't know them yet
 type Options<T extends Element> = MarkOptional<
@@ -153,12 +154,24 @@ class Manager {
               seed: 1,
             }
           );
-        } else {
+        } else if (element.shape_type === "text") {
           this.rc.rectangle(
             element.x - 10,
-            element.y - 10,
+            element.y - 20,
             element.width + 20,
             element.height + 20,
+            {
+              seed: 1,
+            }
+          );
+        } else {
+          const coords = getRectCoordinates(element);
+
+          this.rc.rectangle(
+            coords.x1 - 10,
+            coords.y1 - 10,
+            coords.x2 - coords.x1 + 20,
+            coords.y2 - coords.y1 + 20,
             {
               seed: 1,
             }

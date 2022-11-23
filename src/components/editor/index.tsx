@@ -357,7 +357,7 @@ export default function Editor() {
     return () => {
       window.removeEventListener("keydown", cb);
     };
-  });
+  }, [activeElement, editorManager]);
 
   return (
     <div>
