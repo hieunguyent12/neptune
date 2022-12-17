@@ -12,6 +12,28 @@ datasource db {
   relationMode = "prisma"
 }
 
+model Notebook {
+  id         String    @id @default(cuid())
+  userId     String
+  name       String
+  created_at DateTime
+  updated_at DateTime?
+  user       User      @relation(fields: [userId], references: [id])
+  page       Page[]
+}
+
+model Page {
+  id         String    @id @default(cuid())
+  userId     String
+  notebookId String
+  name       String
+  canvasData String
+  created_at DateTime
+  updated_at DateTime?
+  notebook   Notebook  @relation(fields: [notebookId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -40,13 +62,15 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String     @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?    @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
+  Notebook      Notebook[]
+  Page          Page[]
 }
 
 model VerificationToken {

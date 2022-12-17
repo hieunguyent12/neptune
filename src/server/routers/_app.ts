@@ -1,18 +1,11 @@
-import { z } from "zod";
-import { protectedProcedure, router } from "../trpc";
+import { router } from "../trpc";
+
+import { notebookRouter } from "./notebook";
+import { pageRouter } from "./page";
 
 export const appRouter = router({
-  hello: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-      })
-    )
-    .query(async ({ input }) => {
-      return {
-        id: 1,
-      };
-    }),
+  notebook: notebookRouter,
+  page: pageRouter,
 });
 
 // export type definition of API

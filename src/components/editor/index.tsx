@@ -19,7 +19,11 @@ import { getRectCoordinates } from "./utils";
 
 import Manager from "./manager";
 
-export default function Editor() {
+type Props = {
+  canvasJSON?: string;
+};
+
+export default function Editor({ canvasJSON }: Props) {
   const [_editorManager, setEditorManager] = useState<Maybe<Manager>>(null);
   const editorManager = _editorManager!;
 
@@ -251,8 +255,14 @@ export default function Editor() {
 
     const editorManager = new Manager(roughCanvas, canvas);
 
+    if (canvasJSON) {
+      editorManager.replaceAllElements(JSON.parse(canvasJSON));
+
+      editorManager.drawElements();
+    }
+
     setEditorManager(editorManager);
-  }, []);
+  }, [canvasJSON, canvasDimensions]);
 
   // we need to set the dimensions inside a useEffect because "window" does not exist when Next.js renders the page in the server
   useEffect(() => {

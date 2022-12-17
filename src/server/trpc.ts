@@ -7,7 +7,7 @@ import { Context } from "./context";
 // is common in i18n libraries.
 const t = initTRPC.context<Context>().create();
 
-const isAuthed = t.middleware(({ next, ctx }) => {
+const isAuthed = t.middleware(async ({ next, ctx }) => {
   if (!ctx.session?.user?.email) {
     throw new TRPCError({
       code: "UNAUTHORIZED",

@@ -1,13 +1,18 @@
 import { inferAsyncReturnType } from "@trpc/server";
 import * as trpcNext from "@trpc/server/adapters/next";
-import { getSession } from "next-auth/react";
+import { unstable_getServerSession } from "next-auth";
+import { authOptions } from "../pages/api/auth/[...nextauth]";
 
 /**
  * Creates context for an incoming request
  * @link https://trpc.io/docs/context
  */
 export async function createContext(opts: trpcNext.CreateNextContextOptions) {
-  const session = await getSession({ req: opts.req });
+  const session = await unstable_getServerSession(
+    opts.req,
+    opts.res,
+    authOptions
+  );
 
   return {
     session,
