@@ -20,6 +20,8 @@ export type GenericElement =
 
 export type Element = GenericElement | LinearElement | TextElement;
 
+export type ElementStore = { [key: string]: Element };
+
 export type RectangleElement = BaseElement & {
   shape_type: SHAPE_TYPES["RECTANGLE"];
 };

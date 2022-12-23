@@ -38,11 +38,16 @@ export function getLinearCoordinates(element: LinearElement) {
     y2: 0,
   };
 
-  const _x1 = element.points[0][0];
-  const _x2 = element.points[1][0];
+  const x1 = element.points[0][0];
+  const x2 = element.points[1][0];
 
-  const _y1 = element.points[0][1];
-  const _y2 = element.points[1][1];
+  const y1 = element.points[0][1];
+  const y2 = element.points[1][1];
+
+  coordinates.x1 = x2 > x1 ? x1 : x2;
+  coordinates.x2 = x2 > x1 ? x2 : x1;
+  coordinates.y1 = y2 > y1 ? y1 : y2;
+  coordinates.y2 = y2 > y1 ? y2 : y1;
 
   return coordinates;
 }
