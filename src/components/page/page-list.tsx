@@ -2,13 +2,29 @@ import Link from "next/link";
 import { useState } from "react";
 import { trpc, mutateCache } from "../../utils/trpc";
 import { Page } from "@prisma/client";
+import { appState as useAppState } from "../../appState";
 
 type Props = {
   notebookId: string;
   pages: Page[];
+  isLoggedIn: boolean;
 };
 
-export default function PagesList({ notebookId, pages }: Props) {
+export default function PagesList({ notebookId, pages, isLoggedIn }: Props) {
+  if (isLoggedIn) {
+    return <PagesListForAuthedUser notebookId={notebookId} pages={pages} />;
+  } else {
+    return <PagesListForGuest notebookId={notebookId} pages={pages} />;
+  }
+}
+
+function PagesListForAuthedUser({
+  notebookId,
+  pages,
+}: {
+  notebookId: string;
+  pages: Page[];
+}) {
   const utils = trpc.useContext();
   const createPage = trpc.page.create.useMutation({
     onSuccess(newData) {
@@ -32,27 +48,76 @@ export default function PagesList({ notebookId, pages }: Props) {
     },
   });
 
-  const [newPageName, setNewPageName] = useState("");
+  const onCreatePage = (name: string, notebookId: string) => {
+    if (name === "") return;
 
-  const onCreatePage = async () => {
-    if (newPageName === "") {
-      return;
-    }
-
-    createPage.mutate({ notebookId, name: newPageName });
+    createPage.mutate({ notebookId, name });
   };
 
-  const onUpdatePage = async (name: string, id: string) => {
+  const onUpdatePage = (name: string, id: string) => {
+    if (name === "") return;
+
     updatePage.mutate({ id, name });
   };
 
-  const onDeletePage = async (id: string) => {
+  const onDeletePage = (id: string) => {
     deletePage.mutate({ id });
   };
 
   return (
+    <_PagesListInner
+      notebookId={notebookId}
+      pages={pages}
+      onCreatePage={onCreatePage}
+      onUpdatePage={onUpdatePage}
+      onDeletePage={onDeletePage}
+    />
+  );
+}
+
+function PagesListForGuest({
+  notebookId,
+  pages,
+}: {
+  notebookId: string;
+  pages: Page[];
+}) {
+  const createPage = useAppState((state) => state.addPage);
+  const updatePage = useAppState((state) => state.updatePage);
+  const deletePage = useAppState((state) => state.deletePage);
+
+  return (
+    <_PagesListInner
+      notebookId={notebookId}
+      pages={pages}
+      onCreatePage={createPage}
+      onUpdatePage={updatePage}
+      onDeletePage={deletePage}
+    />
+  );
+}
+
+function _PagesListInner({
+  onCreatePage,
+  onUpdatePage,
+  onDeletePage,
+  pages,
+  notebookId,
+}: {
+  notebookId: string;
+  pages: Page[];
+  onCreatePage: (name: string, notebookId: string) => void;
+  onUpdatePage: (name: string, id: string) => void;
+  onDeletePage: (id: string) => void;
+}) {
+  const [newPageName, setNewPageName] = useState("");
+
+  return (
     <div>
-      <button className="bg-green-200 p-2" onClick={onCreatePage}>
+      <button
+        className="bg-green-200 p-2"
+        onClick={() => onCreatePage(newPageName, notebookId)}
+      >
         create page
       </button>
       <input

@@ -39,7 +39,10 @@ export class ElementUtils {
     };
   }
 
-  static drawElements(elements: { [key: string]: Element }) {
+  static drawElements(
+    elements: { [key: string]: Element },
+    elementIds: string[]
+  ) {
     const rc = ElementUtils.roughCanvas;
     const canvas = ElementUtils.canvas;
 
@@ -47,7 +50,7 @@ export class ElementUtils {
       const ctx = canvas.getContext("2d");
       ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-      Object.keys(elements).forEach((elementKey) => {
+      elementIds.forEach((elementKey) => {
         const element = elements[elementKey];
 
         if (element.shape_type === "rectangle") {

@@ -51,3 +51,5 @@ export function getLinearCoordinates(element: LinearElement) {
 
   return coordinates;
 }
+
+export function checkIdle() {}

@@ -4,6 +4,7 @@ import { useRerender } from "./useRerender";
 
 export type EditorState = {
   elements: ElementStore;
+  elementIds: string[];
   activeShape: SHAPE;
   activeElementId: string | null;
   isDrawing: boolean;
@@ -13,6 +14,7 @@ export type EditorState = {
 export function useInitState() {
   const mutableEditorState = useRef<EditorState>({
     elements: {},
+    elementIds: [],
     activeShape: "selection",
     activeElementId: null,
     isDrawing: false,
@@ -22,6 +24,15 @@ export function useInitState() {
   const rerender = useRerender();
 
   const updateElement = (args: Partial<Element> & { id: string }) => {
+    const el = mutableEditorState.current.elements[args.id];
+
+    // create a new element if it doesn't exist
+    if (!el) {
+      updateEditorState({
+        elementIds: [...mutableEditorState.current.elementIds, args.id],
+      });
+    }
+
     mutableEditorState.current.elements[args.id] = {
       ...mutableEditorState.current.elements[args.id],
       ...args,
@@ -30,12 +41,19 @@ export function useInitState() {
 
   const removeElement = (id: string) => {
     const newElements = { ...mutableEditorState.current.elements };
+    const newElementsIds = [...mutableEditorState.current.elementIds];
+
     if (newElements[id]) {
       delete newElements[id];
     }
 
+    const idx = newElementsIds.findIndex((_id) => _id === id);
+
+    newElementsIds.splice(idx, 1);
+
     updateEditorState({
       elements: newElements,
+      elementIds: newElementsIds,
     });
   };
 

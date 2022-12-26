@@ -1,9 +1,20 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Notebook } from "@prisma/client";
+import { appState as useAppState } from "../../appState";
 import { trpc, mutateCache } from "../../utils/trpc";
 
-export default function NotebookList() {
+export default function NotebookList({ isLoggedIn }: { isLoggedIn: boolean }) {
+  // if user is not logged in, persist their data in indexedDB
+
+  if (isLoggedIn) {
+    return <NotebookListForAuthedUser />;
+  } else {
+    return <NotebookListForGuest />;
+  }
+}
+
+function NotebookListForAuthedUser() {
   const utils = trpc.useContext();
   const createNotebook = trpc.notebook.create.useMutation({
     onSuccess(newData) {
@@ -28,27 +39,25 @@ export default function NotebookList() {
   });
   const allNotebooks = trpc.notebook.getAllNotebooks.useQuery();
 
-  const [newNotebookName, setNewNotebookName] = useState("");
-
-  const onCreateNotebook = async () => {
+  const onCreateNotebook = (newNotebookName: string) => {
     if (newNotebookName === "") {
       return;
     }
 
-    await createNotebook.mutate({
+    createNotebook.mutate({
       name: newNotebookName,
     });
   };
 
-  const onUpdateNotebook = async (name: string, id: string) => {
-    await updateNotebook.mutate({
+  const onUpdateNotebook = (name: string, id: string) => {
+    updateNotebook.mutate({
       name,
       id,
     });
   };
 
-  const onDeleteNotebook = async (notebookId: string) => {
-    await deleteNotebook.mutate({
+  const onDeleteNotebook = (notebookId: string) => {
+    deleteNotebook.mutate({
       id: notebookId,
     });
   };
@@ -58,14 +67,62 @@ export default function NotebookList() {
   if (!allNotebooks.data) return <p>Empty :( </p>;
 
   return (
+    <_NotebookListInner
+      allNotebooks={allNotebooks.data}
+      onCreateNotebook={onCreateNotebook}
+      onUpdateNotebook={onUpdateNotebook}
+      onDeleteNotebook={onDeleteNotebook}
+    />
+  );
+}
+
+function NotebookListForGuest() {
+  const allNotebooks = useAppState((state) => state.notebooks);
+  const addNotebook = useAppState((state) => state.addNotebook);
+  const updateNotebook = useAppState((state) => state.updateNotebook);
+  const deleteNotebook = useAppState((state) => state.deleteNotebook);
+
+  const onCreateNotebook = (name: string) => addNotebook(name);
+
+  const onUpdateNotebook = (name: string, id: string) =>
+    updateNotebook(name, id);
+
+  const onDeleteNotebook = (notebookId: string) => deleteNotebook(notebookId);
+
+  return (
+    <_NotebookListInner
+      allNotebooks={allNotebooks as Notebook[]}
+      onCreateNotebook={onCreateNotebook}
+      onUpdateNotebook={onUpdateNotebook}
+      onDeleteNotebook={onDeleteNotebook}
+    />
+  );
+}
+
+type NotebookListInnerProps = {
+  allNotebooks: Notebook[];
+  onCreateNotebook: (name: string) => void;
+  onUpdateNotebook: (name: string, id: string) => void;
+  onDeleteNotebook: (notebookId: string) => void;
+};
+
+function _NotebookListInner({
+  allNotebooks,
+  onCreateNotebook,
+  onDeleteNotebook,
+  onUpdateNotebook,
+}: NotebookListInnerProps) {
+  const [newNotebookName, setNewNotebookName] = useState("");
+
+  return (
     <div>
-      <button onClick={onCreateNotebook}>add</button>
+      <button onClick={() => onCreateNotebook(newNotebookName)}>add</button>
       <input
         name="new-notebook"
         value={newNotebookName}
         onChange={(e) => setNewNotebookName(e.target.value)}
       />
-      {allNotebooks.data.map((notebook) => (
+      {allNotebooks.map((notebook) => (
         <NotebookItem
           key={notebook.id}
           notebook={notebook}

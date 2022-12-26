@@ -56,7 +56,7 @@ const CanvasTextEditor = (props: { x: number; y: number; id: string }) => {
         true
       );
 
-      ElementUtils.drawElements(editorState.elements);
+      ElementUtils.drawElements(editorState.elements, editorState.elementIds);
     }
   };
 

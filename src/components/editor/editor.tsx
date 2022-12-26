@@ -3,6 +3,7 @@ import { useState, useRef, MouseEvent, useEffect } from "react";
 // @ts-ignore
 import rough from "roughjs/bundled/rough.cjs";
 import { RoughCanvas } from "roughjs/bin/canvas";
+import { set } from "idb-keyval";
 
 import { SHAPES } from "./constants";
 import { SHAPE, Element } from "./types";
@@ -119,7 +120,7 @@ function _Editor({ canvasJSON = "" }: EditorProps) {
         });
       }
 
-      ElementUtils.drawElements(editorState.elements);
+      ElementUtils.drawElements(editorState.elements, editorState.elementIds);
     } else if (
       editorState.activeShape === "linear" &&
       activeElement.shape_type === "linear"
@@ -132,7 +133,7 @@ function _Editor({ canvasJSON = "" }: EditorProps) {
         ],
       });
 
-      ElementUtils.drawElements(editorState.elements);
+      ElementUtils.drawElements(editorState.elements, editorState.elementIds);
     }
   };
 
@@ -228,7 +229,7 @@ function _Editor({ canvasJSON = "" }: EditorProps) {
           activeElementId: null,
         });
 
-        ElementUtils.drawElements(editorState.elements);
+        ElementUtils.drawElements(editorState.elements, editorState.elementIds);
       }
     }
   };
@@ -257,11 +258,19 @@ function _Editor({ canvasJSON = "" }: EditorProps) {
     }
   };
 
+  const saveState = () => {
+    set("appState", {
+      notebooks: [],
+      pages: [],
+    });
+  };
+
   return (
     <div className="editor-container">
       <button onClick={() => console.log(editorState.elements)}>
         log state
       </button>
+      <button onClick={saveState}>save state</button>
       {renderShapeOptions()}
 
       <div className="text-editor">
